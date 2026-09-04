@@ -299,7 +299,7 @@
 
   function handleBossClick() {
     let pw = prompt("비밀번호는 기억하냐?");
-    if (pw === "1234") {
+    if (pw === "0617") {
       switchModal('modal-recruit', 'modal-admin');
       fetchAllAdminData();
     } else if (pw !== null) {
@@ -322,7 +322,7 @@
       renderAdminData('상담문의');
     })
     .catch(err => {
-      container.innerHTML = "<p style='color:red; text-align:center;'>데이터 연동 실패! 스크립트 주소를 확인해라.</p>";
+      container.innerHTML = "<p style='color:red; text-align:center;'>데이터 연동 실패! 아무 버튼이나 눌러봐.</p>";
     });
   }
 
