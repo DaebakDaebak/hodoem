@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>대박흥신소</title>
+<style>
+  /* 기본 설정 */
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background-color: #000; color: #fff;
+    font-family: '궁서', 'Gungsuh', 'Batang', serif;
+    overflow: hidden; 
+  }
+  #app-container {
+    width: 100%; max-width: 480px; margin: 0 auto;
+    height: 100vh; background-color: #000; position: relative;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  }
+  #main-page {
+    height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory;
+    display: block; -ms-overflow-style: none; scrollbar-width: none;
+  }
+  #main-page::-webkit-scrollbar { display: none; }
+  .section {
+    position: relative; height: 100vh; scroll-snap-align: start;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 15px; box-sizing: border-box;
+  }
+  
+  /* 타이틀 및 말풍선 수정 영역 */
+  .title-wrapper { 
+    position: relative; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%; 
+    min-height: 220px;
+  }
+  .spiky-main-bubble {
+    position: absolute;
+    width: 360px; 
+    height: 210px; 
+    background-color: #FFFF00;
+    clip-path: polygon(50% 0%, 58% 18%, 81% 6%, 71% 27%, 100% 38%, 76% 50%, 95% 77%, 68% 70%, 65% 100%, 50% 75%, 35% 100%, 32% 70%, 5% 77%, 24% 50%, 0% 38%, 29% 27%, 19% 6%, 42% 18%);
+    z-index: 1; /* 배경으로 깔림 */
+  }
+  .main-title { 
+    position: relative;
+    font-size: 3.6rem; 
+    color: #FF0000; 
+    text-shadow: 3px 3px 0 #000000; 
+    font-weight: 900; 
+    margin: 0; 
+    z-index: 2; /* 글자가 위로 올라옴 */
+    letter-spacing: -2px;
+    white-space: nowrap;
+  }
+  
+  /* 보조 말풍선 */
+  .oval-bubble {
+    position: absolute; display: flex; justify-content: center; align-items: center;
+    font-size: 1.1rem; font-weight: 900; border-radius: 50%; width: 90px; height: 55px;
+    z-index: 3; border: 3px solid #FFF; box-shadow: 2px 2px 0 #000;
+  }
+  .bubble-1 { top: -10px; left: -5px; background-color: #00FFFF; color: #000; transform: rotate(-15deg); }
+  .bubble-2 { bottom: -15px; right: -5px; background-color: #FF00FF; color: #FFF; transform: rotate(15deg); }
+  
+  /* 텍스트 스타일 */
+  .title-text { font-size: 1.8rem; color: #FF00FF; text-shadow: 2px 2px 0 #FFFF00; margin-bottom: 15px; font-weight: 900; line-height: 1.3; }
+  .subtitle-text { font-size: 1.2rem; color: #00FFFF; line-height: 1.6; word-break: keep-all; }
+  .highlight { background-color: #FF0000; color: #FFFF00; padding: 0 5px; }
+  .tiny-faded { font-size: 0.7rem; color: #999; background-color: transparent; vertical-align: middle; opacity: 0.8; filter: blur(0.2px); margin: 0 4px; }
+  
+  .blink-button {
+    background-color: #FF0000; color: #FFFF00; font-size: 1.5rem;
+    font-family: '궁서', 'Gungsuh', serif; font-weight: bold; padding: 15px 25px;
+    border: 5px dashed #FFFF00; cursor: pointer; animation: blinker 0.8s linear infinite;
+    margin-bottom: 30px; width: 90%;
+  }
+  .menu-text { font-size: 1.2rem; color: #00FF00; text-decoration: underline; word-spacing: 15px; cursor: pointer; }
+  .menu-text span:hover { color: #FFF; background: #F00; }
+  @keyframes blinker { 50% { opacity: 0; } }
+
+  /* 팝업(모달) */
+  .modal-overlay {
+    display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center;
+  }
+  .modal-content {
+    position: relative; background-color: #111; border: 4px double #FFF;
+    width: 92%; max-height: 85vh; overflow-y: auto; padding: 30px 15px;
+    box-sizing: border-box; text-align: center; box-shadow: 0 0 15px #FFFF00;
+  }
+  .modal-content::-webkit-scrollbar { display: none; }
+  .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2rem; color: #FFF; cursor: pointer; font-family: sans-serif; }
+  .modal-title { font-size: 2rem; color: #FFFF00; text-shadow: 2px 2px 0 #FF0000; margin-bottom: 20px; }
+  
+  /* 입력 폼 */
+  .retro-form { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+  .retro-form input[type="text"], .retro-form textarea { width: 95%; background-color: #000; color: #00FF00; border: 3px solid #FF0000; font-family: '궁서'; font-size: 1.1rem; padding: 10px; box-sizing: border-box; }
+  .submit-btn { background-color: #0000FF; color: #FFFF00; font-size: 1.5rem; font-family: '궁서'; padding: 12px 30px; border: 4px dotted #FFFF00; cursor: pointer; margin-top: 10px; width: 95%; }
+  .privacy-check { width: 95%; font-size: 0.9rem; color: #FF9999; text-align: left; margin-top: 10px; line-height: 1.4; border: 1px solid #555; padding: 10px; box-sizing: border-box; }
+  
+  /* 약도 */
+  .tree-map { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+  .tree-node { border: 2px solid #FFF; padding: 6px 10px; background: #333; font-size: 1.1rem; }
+  .tree-line-v { width: 3px; height: 20px; background: #FFF; }
+  .tree-branch { display: flex; align-items: center; width: 100%; max-width: 250px; justify-content: flex-start; }
+  .tree-branch.right { justify-content: flex-end; }
+  .tree-line-h { width: 20px; height: 3px; background: #FFF; }
+  .tree-agency { background: #FF0000; color: #FFFF00; font-weight: bold; border-color: #FFFF00; }
+
+  /* 관리자 전용 테이블 */
+  .admin-btn-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+  .admin-btn { flex: 1; background-color: #333; color: #FFF; font-size: 1.2rem; font-family: '궁서'; padding: 10px; border: 2px solid #FFF; cursor: pointer; }
+  .admin-btn.active { background-color: #FF0000; color: #FFFF00; border-color: #FFFF00; }
+  .admin-table-wrapper { width: 100%; overflow-x: auto; margin-top: 10px; }
+  .data-table { width: 100%; min-width: 320px; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+  .data-table th, .data-table td { border: 1px solid #555; padding: 8px; word-break: break-word; }
+  .data-table th { background-color: #333; color: #FFFF00; text-align: center; }
+</style>
+</head>
+<body>
+<div id="app-container">
+
+  <!-- 메인 스크롤 페이지 -->
+  <div id="main-page">
+    <div class="section">
+      <!-- 층을 나눈 타이틀 적용 부분 -->
+      <div class="title-wrapper">
+        <div class="spiky-main-bubble"></div>
+        <h1 class="main-title">대박흥신소</h1>
+        <div class="oval-bubble bubble-1">신속정확</div>
+        <div class="oval-bubble bubble-2">비밀보장</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title-text">💖사랑합니다 고객님^^💖</div>
+      <div class="subtitle-text">가족같은 마음으로 모시겠습니다.<br><span class="highlight">24시간 친절 상담 대기 중</span></div>
+    </div>
+
+    <div class="section">
+      <div class="title-text">🕵️ 무엇이든 해결해 드립니다</div>
+      <div class="subtitle-text" style="color: #FFFF00; text-shadow: 1px 1px #FF0000;">
+        * 티 안 나는 잠입수사 *<br>* 집 나간 나비(동물) 찾기 *<br>* 첫사랑부터 채무자까지 사람찾기 *<br>* 확실한 불륜 증거 수집 *<br>* 철통 보안 VIP 경호 *
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title-text">💻 최첨단 디지털 수사망 구축</div>
+      <div class="subtitle-text">
+        사이버 수사 전문업체와 <span class="highlight">독점<span class="tiny-faded">비슷한</span>협업</span><br>
+        아날로그 발로 뛰는 수사와<br>디지털 데이터 분석의 완벽한 조화
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title-text">🤝 유명 변호사 사무실 MOU 체결</div>
+      <div class="subtitle-text" style="color: #FFFF00; text-shadow: 1px 1px #FF0000;">
+        <span class="tiny-faded">거의</span>합법적인 선을 지키는 <span class="highlight">확실한 수사 협력</span><br>
+        * 민/형사 사건 가리지 않고 다수 해결한 경험 보유 *<br>
+        * 빼도 박도 못할 결정적 증거 확보 *
+      </div>
+    </div>
+    
+    <div class="section">
+      <button class="blink-button" onclick="openModal('modal-consult')">🚨 묻지도 따지지도 않고<br>상담하기 🚨</button>
+      <div class="menu-text">
+        <span onclick="openModal('modal-location')">[오시는길]</span> 
+        <span onclick="openModal('modal-recruit')">[구인(가족모집)]</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팝업 1: 상담하기 -->
+  <div id="modal-consult" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('modal-consult')">&times;</span>
+      <h2 class="modal-title">🚨 비밀보장 100%<br>온라인 상담소 🚨</h2>
+      <div style="font-size: 1.3rem; color: #00FF00; margin-bottom: 20px;">☎ 직통 전화: 02-8282-4444<br>(신속하게 처리해드립니다)</div>
+      
+      <form id="form-consult" class="retro-form" onsubmit="submitData(event, 'form-consult', '감사합니다. 내용 확인 후 신속하게 연락드리겠습니다 고객님^^')">
+        <input type="hidden" name="form_type" value="상담문의">
+        <input type="text" name="name" placeholder="이름" required>
+        <input type="text" name="phone" placeholder="연락처 (예: 010-XXXX-XXXX)" required>
+        <textarea name="message" rows="5" placeholder="상담하실 내용을 자세히 적어주십시오." required></textarea>
+        <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>절대 실제 개인정보 및 민감한 정보를 적지 않았음</b>을 인지하고 동의합니다.</label>
+        <button type="submit" class="submit-btn">전송하기</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 팝업 2: 오시는 길 -->
+  <div id="modal-location" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('modal-location')">&times;</span>
+      <h2 class="modal-title">🗺️ 은밀하게 오시는 길 🗺️</h2>
+      <div style="font-size: 1.1rem; color: #00FFFF; margin-bottom: 20px;">서울특별시 백산동 구름다리 밑 삼거리,<br>상가 건물 2층 복도</div>
+      <div class="tree-map">
+        <div class="tree-node">2층 계단 입구</div>
+        <div class="tree-line-v"></div>
+        <div class="tree-branch right"><div class="tree-node" style="font-size: 0.9rem;">작은 외과 & 약국 (우측)</div><div class="tree-line-h"></div></div>
+        <div class="tree-line-v"></div>
+        <div class="tree-branch"><div class="tree-line-h"></div><div class="tree-node" style="font-size: 0.9rem;">중국집 (좌측)</div></div>
+        <div class="tree-line-v"></div>
+        <div class="tree-node tree-agency">대박흥신소<br>(복도 맨 끝)</div>
+      </div>
+      <div style="font-size: 0.9rem; color: #BBB; margin-top: 20px;">* 길 찾기가 어려우시면 언제든 편하게 연락 주십시오.<br>(☎ 02-8282-4444)</div>
+    </div>
+  </div>
+
+  <!-- 팝업 3: 구인 (가족모집) -->
+  <div id="modal-recruit" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('modal-recruit')">&times;</span>
+      <h2 class="modal-title">🤝 구인(가족모집) 🤝</h2>
+      <div style="border: 2px solid #FFF; padding: 15px; text-align: left; display: inline-block; width: 100%; font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px; background: #222; box-sizing: border-box;">
+        <span style="color: #00FF00; font-size: 1.3rem; font-weight:bold;">
+          [ 대표 <span onclick="handleBossClick()" style="color: inherit; text-decoration: underline; cursor: pointer;">장태식</span>의 한 말씀 ]
+        </span><br><br>
+        안녕하십니까. 대박흥신소 대표 장태식입니다.<br>
+        저희는 구차하게 스펙, 학벌 따위 보지 않습니다.<br>
+        애매하게 머리 굴리는 놈들 치고 결과가 좋은 것을 못 봤습니다.<br>
+        제가 보는 것은 사나이의 가슴을 울리는 <strong>'의리'</strong>와 목표를 향한 <strong>'열정'</strong>입니다.<br>
+        물론 몸만 쓰는 것은 아닙니다. 상황을 꿰뚫어보는 명석한 두뇌를 가진 분도 대환영입니다. 가족처럼 일하실 분, 주저 말고 오십시오.
+      </div>
+      <div style="font-size: 1.1rem; color: #FFFF00; margin-bottom: 20px; text-align: left; display: inline-block; word-break: keep-all; line-height: 1.5;">
+        ✔️ 밤눈이 부엉이 급인 분 (야간 잠복수사 특화)<br><br>✔️ 입이 무거운 자물쇠인 분 (비밀 유지 200%)<br><br>✔️ 100m 12초 주파가 가능한 날쌘돌이인 분 (도주 및 추격 전문가)<br><br>✔️ 능청스럽게 상황을 모면하는 천의 얼굴인 분 (잠입수사 능력자)
+      </div>
+      <button class="submit-btn" style="background-color: #FF00FF; border-color: #00FFFF;" onclick="switchModal('modal-recruit', 'modal-apply')">지원하기</button>
+    </div>
+  </div>
+
+  <!-- 팝업 4: 지원서 작성 -->
+  <div id="modal-apply" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('modal-apply')">&times;</span>
+      <h2 class="modal-title">📝 지원서 작성 📝</h2>
+      <form id="form-apply" class="retro-form" onsubmit="submitData(event, 'form-apply', '지원서가 정상적으로 접수되었습니다. 꼼꼼히 검토 후 연락드리겠습니다. 감사합니다^^')">
+        <input type="hidden" name="form_type" value="구인지원">
+        <input type="text" name="name" placeholder="성명" required>
+        <input type="text" name="phone" placeholder="전화번호" required>
+        <textarea name="message" rows="6" maxlength="300" placeholder="자기소개 (300자 제한) - 본인의 장점과 열정을 적어주십시오." required></textarea>
+        <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>절대 실제 개인정보를 적지 않았음</b>을 인지하고 동의합니다.</label>
+        <button type="submit" class="submit-btn">제출하기</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 팝업 5: 관리자 전용 대시보드 (이스터에그) -->
+  <div id="modal-admin" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('modal-admin')">&times;</span>
+      <h2 class="modal-title">🖥️ 대표 장태식<br>전용 관리망 🖥️</h2>
+      
+      <div class="admin-btn-group">
+        <button id="btn-consult" class="admin-btn active" onclick="renderAdminData('상담문의')">상담 내역</button>
+        <button id="btn-recruit" class="admin-btn" onclick="renderAdminData('구인지원')">구인 내역</button>
+      </div>
+
+      <div id="admin-data-container" style="color: #00FF00; font-size: 1rem; text-align: left;">
+        데이터망 접속 중... 잠시만 기다려라.
+      </div>
+    </div>
+  </div>
+
+</div> 
+
+<script>
+  // 하단의 URL 부분에 본인의 웹 앱 주소를 꼭 덮어씌워주세요!
+  const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbya-tpna3LIhT83mA1C0DFD4LNGrelSHrP5fh2Yh1nA_5Ksz2YUxqPRkvMsWIPYM4Rd/exec";
+
+  function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+  function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+  function switchModal(closeId, openId) { closeModal(closeId); openModal(openId); }
+
+  function submitData(event, formId, alertMessage) {
+    event.preventDefault(); 
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch(googleAppScriptUrl + "?mode=data", { 
+      method: 'POST', 
+      mode: 'no-cors', 
+      body: formData 
+    })
+    .then(() => {
+      alert(alertMessage); 
+      form.reset(); 
+      closeModal(formId.replace('form-', 'modal-')); 
+    }).catch(() => {
+      alert(alertMessage); 
+      form.reset();
+      closeModal(formId.replace('form-', 'modal-'));
+    });
+  }
+
+  function handleBossClick() {
+    let pw = prompt("비밀번호는 기억하냐?");
+    if (pw === "1234") {
+      switchModal('modal-recruit', 'modal-admin');
+      fetchAllAdminData();
+    } else if (pw !== null) {
+      alert("비밀번호도 까먹냐.");
+    }
+  }
+
+  let globalAdminData = [];
+  function fetchAllAdminData() {
+    const container = document.getElementById('admin-data-container');
+    container.innerHTML = "데이터망 접속 중... 실시간으로 땡겨오고 있음.";
+    
+    document.getElementById('btn-consult').classList.add('active');
+    document.getElementById('btn-recruit').classList.remove('active');
+
+    fetch(googleAppScriptUrl + "?mode=data")
+    .then(res => res.json())
+    .then(data => {
+      globalAdminData = data;
+      renderAdminData('상담문의');
+    })
+    .catch(err => {
+      container.innerHTML = "<p style='color:red; text-align:center;'>데이터 연동 실패! 스크립트 주소를 확인해라.</p>";
+    });
+  }
+
+  function renderAdminData(type) {
+    const container = document.getElementById('admin-data-container');
+    
+    if(type === '상담문의') {
+      document.getElementById('btn-consult').classList.add('active');
+      document.getElementById('btn-recruit').classList.remove('active');
+    } else {
+      document.getElementById('btn-recruit').classList.add('active');
+      document.getElementById('btn-consult').classList.remove('active');
+    }
+
+    if (globalAdminData.length <= 1) { 
+      container.innerHTML = `<p style="text-align:center;">아직 접수된 데이터가 없습니다.</p>`;
+      return;
+    }
+
+    let filtered = globalAdminData.filter((row, index) => index !== 0 && row[1] === type); 
+    
+    if (filtered.length === 0) {
+      container.innerHTML = `<p style="text-align:center;">접수된 [${type}] 내역이 없습니다.</p>`;
+      return;
+    }
+
+    let html = '<div class="admin-table-wrapper"><table class="data-table"><tr><th style="width:25%;">이름</th><th style="width:30%;">연락처</th><th>내용</th></tr>';
+    
+    filtered.forEach(row => {
+      html += `<tr>
+        <td>${row[2] || ''}</td>
+        <td>${row[3] || ''}</td>
+        <td>${row[4] || ''}</td>
+      </tr>`;
+    });
+    html += '</table></div>';
+    
+    container.innerHTML = html;
+  }
+</script>
+</body>
+</html>
