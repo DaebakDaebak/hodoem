@@ -99,17 +99,106 @@
   /* 입력 폼 */
   .retro-form { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
   .retro-form input[type="text"], .retro-form textarea { width: 95%; background-color: #000; color: #00FF00; border: 3px solid #FF0000; font-family: '궁서'; font-size: 1.1rem; padding: 10px; box-sizing: border-box; }
-  .submit-btn { background-color: #0000FF; color: #FFFF00; font-size: 1.5rem; font-family: '궁서'; padding: 12px 30px; border: 4px dotted #FFFF00; cursor: pointer; margin-top: 10px; width: 95%; }
+  
+  /* 버튼 줄바꿈 방지 적용 (box-sizing 및 white-space 추가) */
+  .submit-btn { 
+    background-color: #0000FF; color: #FFFF00; font-size: 1.5rem; 
+    font-family: '궁서'; padding: 12px 30px; border: 4px dotted #FFFF00; 
+    cursor: pointer; margin-top: 10px; width: 95%; 
+    box-sizing: border-box; white-space: nowrap; 
+  }
   .privacy-check { width: 95%; font-size: 0.9rem; color: #FF9999; text-align: left; margin-top: 10px; line-height: 1.4; border: 1px solid #555; padding: 10px; box-sizing: border-box; }
   
-  /* 약도 */
-  .tree-map { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
-  .tree-node { border: 2px solid #FFF; padding: 6px 10px; background: #333; font-size: 1.1rem; }
-  .tree-line-v { width: 3px; height: 20px; background: #FFF; }
-  .tree-branch { display: flex; align-items: center; width: 100%; max-width: 250px; justify-content: flex-start; }
-  .tree-branch.right { justify-content: flex-end; }
-  .tree-line-h { width: 20px; height: 3px; background: #FFF; }
-  .tree-agency { background: #FF0000; color: #FFFF00; font-weight: bold; border-color: #FFFF00; }
+  /* 외부 상가 약도 (연필삼거리) */
+  .map-container {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    background-color: #F8F8F8; 
+    border: 4px solid #FFFF00;
+    margin: 20px 0;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    color: #333;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  }
+  .map-road {
+    position: absolute;
+    background-color: #D3D3D3; 
+    border-radius: 10px;
+  }
+  /* 삼거리 (ㅜ 모양) 구현 */
+  .map-road.horizontal {
+    top: 40%; left: -10px; right: -10px; height: 25px; 
+  }
+  .map-road.vertical {
+    top: 40%; bottom: -10px; left: 35%; width: 25px; /* 가로 도로에서 아래로만 뻗음 */
+  }
+  
+  .map-label {
+    position: absolute;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3;
+  }
+  .map-label .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background-color: #222;
+    border-radius: 50%;
+    margin-bottom: 4px;
+  }
+  /* 주변 시설 위치 조정 */
+  .map-label.hosp-txt { top: 15%; left: 65%; } /* 흥신소 맞은편 (위쪽) */
+  .map-label.food-txt { top: 15%; left: 10%; } /* 식당 (왼쪽 위) */
+  .map-label.bus-txt { top: 32%; left: 45%; } /* 도로 바로 위쪽 근처 */
+  .map-label.mart-txt { top: 60%; left: 45%; } /* 흥신소 바로 옆 */
+  
+  /* 건물 아이콘 및 말풍선 텍스트박스 */
+  .map-building {
+    position: absolute;
+    top: 55%; left: 70%;
+    font-size: 2.2rem;
+    line-height: 1;
+    z-index: 2;
+  }
+  .map-agency-box {
+    position: absolute;
+    top: 75%; left: 52%;
+    background-color: #FFF;
+    color: #000;
+    border: 2px solid #000;
+    padding: 6px 12px;
+    font-family: '궁서', 'Gungsuh', serif;
+    font-weight: bold;
+    font-size: 1rem;
+    white-space: nowrap;
+    box-shadow: 2px 2px 0 #000;
+    z-index: 4;
+  }
+  .map-agency-box::before {
+    content: '';
+    position: absolute;
+    top: -9px; left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 7px 9px 7px;
+    border-style: solid;
+    border-color: transparent transparent #000 transparent;
+  }
+  .map-agency-box::after {
+    content: '';
+    position: absolute;
+    top: -6px; left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 5px 7px 5px;
+    border-style: solid;
+    border-color: transparent transparent #FFF transparent;
+  }
 
   /* 관리자 전용 테이블 */
   .admin-btn-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
@@ -127,7 +216,6 @@
   <!-- 메인 스크롤 페이지 -->
   <div id="main-page">
     <div class="section">
-      <!-- 층을 나눈 타이틀 적용 부분 -->
       <div class="title-wrapper">
         <div class="spiky-main-bubble"></div>
         <h1 class="main-title">대박흥신소</h1>
@@ -186,7 +274,8 @@
         <input type="text" name="name" placeholder="성명" required>
         <input type="text" name="phone" placeholder="연락처" required>
         <textarea name="message" rows="5" placeholder="상담하실 내용을 자세히 적어주십시오." required></textarea>
-        <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>실제 개인정보를 적지 않도록<b> 주의해주세요.</label>
+        <!-- 통일된 안내 문구 (안전한 태그 닫기 포함) -->
+        <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>실제 개인정보를 적지 않도록</b> 주의해주세요.</label>
         <button type="submit" class="submit-btn">전송하기</button>
       </form>
     </div>
@@ -197,16 +286,32 @@
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('modal-location')">&times;</span>
       <h2 class="modal-title">🗺️ 은밀하게 오시는 길 🗺️</h2>
-      <div style="font-size: 1.1rem; color: #00FFFF; margin-bottom: 20px;">서울특별시 백산동 구름다리 밑 삼거리,<br>상가 건물 2층 복도</div>
-      <div class="tree-map">
-        <div class="tree-node">2층 계단 입구</div>
-        <div class="tree-line-v"></div>
-        <div class="tree-branch right"><div class="tree-node" style="font-size: 0.9rem;">외과병원 & 약국 (우측)</div><div class="tree-line-h"></div></div>
-        <div class="tree-line-v"></div>
-        <div class="tree-branch"><div class="tree-line-h"></div><div class="tree-node" style="font-size: 0.9rem;">중국집 (좌측)</div></div>
-        <div class="tree-line-v"></div>
-        <div class="tree-node tree-agency">대박흥신소<br>(복도 맨 끝)</div>
+      <div style="font-size: 1.1rem; color: #00FFFF; margin-bottom: 20px;">서울특별시 백산동 연필삼거리,<br>상가건물 2층 </div>
+      
+      <div class="map-container">
+        <!-- 도로 (연필삼거리) -->
+        <div class="map-road horizontal"></div>
+        <div class="map-road vertical"></div>
+        
+        <!-- 주변 시설 및 정류장 -->
+        <div class="map-label bus-txt">
+          <span class="dot"></span>버스정류장
+        </div>
+        <div class="map-label hosp-txt">
+          <span class="dot"></span>화타정형외과
+        </div>
+        <div class="map-label food-txt">
+          <span class="dot"></span>건강삼계탕
+        </div>
+        <div class="map-label mart-txt">
+          <span class="dot"></span>싸다마트
+        </div>
+        
+        <!-- 대박흥신소 건물 -->
+        <div class="map-building">🏢</div>
+        <div class="map-agency-box">대박흥신소 (상가2층)</div>
       </div>
+
       <div style="font-size: 0.9rem; color: #BBB; margin-top: 20px;">* 길 찾기가 어려우시면 언제든 편하게 연락 주십시오.<br>(☎ 02-8282-4444)</div>
     </div>
   </div>
@@ -243,7 +348,8 @@
         <input type="text" name="name" placeholder="성명" required>
         <input type="text" name="phone" placeholder="연락처" required>
         <textarea name="message" rows="6" maxlength="300" placeholder="자기소개 (300자 제한) - 본인의 장점과 열정을 적어주십시오." required></textarea>
-        <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>실제 개인정보를 적지 않도록<b> 주의해주세요.</label>
+        <!-- 통일된 안내 문구 -->
+        <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>실제 개인정보를 적지 않도록</b> 주의해주세요.</label>
         <button type="submit" class="submit-btn">제출하기</button>
       </form>
     </div>
