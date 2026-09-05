@@ -183,8 +183,8 @@
       
       <form id="form-consult" class="retro-form" onsubmit="submitData(event, 'form-consult', '감사합니다. 내용 확인 후 신속하게 연락드리겠습니다 고객님^^')">
         <input type="hidden" name="form_type" value="상담문의">
-        <input type="text" name="name" placeholder="이름" required>
-        <input type="text" name="phone" placeholder="연락처 (예: 010-XXXX-XXXX)" required>
+        <input type="text" name="name" placeholder="성명" required>
+        <input type="text" name="phone" placeholder="연락처" required>
         <textarea name="message" rows="5" placeholder="상담하실 내용을 자세히 적어주십시오." required></textarea>
         <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>절대 실제 개인정보 및 민감한 정보를 적지 않았음</b>을 인지하고 동의합니다.</label>
         <button type="submit" class="submit-btn">전송하기</button>
@@ -201,7 +201,7 @@
       <div class="tree-map">
         <div class="tree-node">2층 계단 입구</div>
         <div class="tree-line-v"></div>
-        <div class="tree-branch right"><div class="tree-node" style="font-size: 0.9rem;">작은 외과 & 약국 (우측)</div><div class="tree-line-h"></div></div>
+        <div class="tree-branch right"><div class="tree-node" style="font-size: 0.9rem;">외과병원 & 약국 (우측)</div><div class="tree-line-h"></div></div>
         <div class="tree-line-v"></div>
         <div class="tree-branch"><div class="tree-line-h"></div><div class="tree-node" style="font-size: 0.9rem;">중국집 (좌측)</div></div>
         <div class="tree-line-v"></div>
@@ -241,7 +241,7 @@
       <form id="form-apply" class="retro-form" onsubmit="submitData(event, 'form-apply', '지원서가 정상적으로 접수되었습니다. 꼼꼼히 검토 후 연락드리겠습니다. 감사합니다^^')">
         <input type="hidden" name="form_type" value="구인지원">
         <input type="text" name="name" placeholder="성명" required>
-        <input type="text" name="phone" placeholder="전화번호" required>
+        <input type="text" name="phone" placeholder="연락처" required>
         <textarea name="message" rows="6" maxlength="300" placeholder="자기소개 (300자 제한) - 본인의 장점과 열정을 적어주십시오." required></textarea>
         <label class="privacy-check"><input type="checkbox" required> [주의] 본 내용은 온라인을 통해 공유될 수 있으므로, <b>절대 실제 개인정보를 적지 않았음</b>을 인지하고 동의합니다.</label>
         <button type="submit" class="submit-btn">제출하기</button>
@@ -338,14 +338,14 @@
     }
 
     if (globalAdminData.length <= 1) { 
-      container.innerHTML = `<p style="text-align:center;">아직 접수된 데이터가 없습니다.</p>`;
+      container.innerHTML = `<p style="text-align:center;">아직 접수된 데이터가 없대.</p>`;
       return;
     }
 
     let filtered = globalAdminData.filter((row, index) => index !== 0 && row[1] === type); 
     
     if (filtered.length === 0) {
-      container.innerHTML = `<p style="text-align:center;">접수된 [${type}] 내역이 없습니다.</p>`;
+      container.innerHTML = `<p style="text-align:center;">접수된 [${type}] 내역 없음.</p>`;
       return;
     }
 
